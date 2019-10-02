@@ -18,7 +18,7 @@ agents = {}
 for row in range(2, 9):
     agents[ref_sheet['A' + str(row)].value] = []
     col_ch = 'B'
-    for col in range(2, len(ref_sheet[row])):
+    for col in range(2, len(ref_sheet[row]) + 1):
         if ref_sheet[col_ch + str(row)].value is not None:
             # Use this check to avoid filtering later to find None values
             agents[ref_sheet['A' + str(row)].value].append(
