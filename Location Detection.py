@@ -86,12 +86,21 @@ a1 = search_town(search_district(search_city(search_prov(cellnum), cellnum), cel
 
 print(a1)
 
-# next step: run through all column in excel, produce a txt file
-# Can't figure out origin, possibly multiple locations
-# thus have to manually select from the list of generated txt file
-# Format:
-#   Cell Num
-#   Location chain 1 (Province, City, Distrcit, Town)
-#   Location chain 2
-#   Empty space
-#   Cell Num
+output = open('location output.txt','w', encoding='utf-8')
+
+start = 3
+
+for row in range(start, main_sheet.max_row + 1):
+    output.write('Row #' + str(row) + '\n')
+    found = search_town(search_district(search_city(search_prov('C' + str(row)), 'C' + str(row)), 'C' + str(row)), 'C' + str(row))
+    for prov in found:
+        for city in found[prov]:
+            for dist in found[prov][city]:
+                if found[prov][city][dist] != []:
+                    for town in found[prov][city][dist]:
+                        output.write(prov +','+city+','+dist+','+town+'\n')
+                else:
+                    output.write(prov +','+city+','+dist+'\n')
+    output.write('\n')
+
+output.close()
