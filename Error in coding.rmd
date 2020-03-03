@@ -1,0 +1,68 @@
+---
+title: "Work Study - Error Checking"
+author: "Zhengkai Fu"
+date: "02/03/2020"
+output: pdf_document
+---
+
+A Bayesian approach on binomial model would be applied here, since the question of interest is the proportion of incorrect coding, which falls between 0 and 1.
+
+The likelihood is $$
+y \sim Bin(n, \theta)
+$$ with prior $\theta \sim \text{Beta}(\alpha,\beta)$.
+
+## Set up Bayesian Binomial Model
+```{stan , output.var = "binomial"}
+// name of the object is 'binomial'
+// the following declares the elements required to make model work
+data {
+int<lower = 0> n;
+// sample size, sensible boundary
+int<lower = 0, upper = 1> errors[n];
+// outcome of coin
+real<lower = 0> alpha;
+real<lower = 0> beta;
+}
+transformed data {
+// transformed data block
+// specify likelihood
+
+// It would be eaiser to just ask for y as data
+// but I wanted to demonstrate the transformed data block
+int<lower = 0, upper = n> y = sum(errors);
+}
+parameters {
+real<lower = 0, upper = 1> theta;
+// chance of head, parameter of interest
+}
+model {
+y ~ binomial(n, theta);
+// likelihood distribution
+theta ~ beta(alpha, beta);
+// beta prior
+}
+```
+
+## Load Data
+```{r load data}
+n = 15
+errors = as.integer(c(1,1,1,0,0,1,0,0,0,1,0,0,0,0,0))
+print(sum(errors)/n)
+```
+
+
+## Fit Data in Model
+```{r fit data}
+library(rstan)
+
+options(mc.cores = parallel::detectCores()) 
+# multi-core 
+
+# Uniform prior
+data = list(n=n, errors = errors, alpha = 0.5, beta = 0.5) 
+
+fit <- sampling(binomial, data = data, chains = 4, iter = 2000, warmup = 1000) 
+
+print(fit)
+plot(fit)
+```
