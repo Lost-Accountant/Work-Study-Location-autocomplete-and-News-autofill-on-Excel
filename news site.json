@@ -1,0 +1,15 @@
+{
+  "standnews":  {
+    "link": "http://thestandnews.com/politics/",
+    "rss":  "https://www.thestandnews.com/rss/"
+  },
+  "scmp":   {
+    "link": "http://scmp.com",
+    "rss":  "https://www.scmp.com/rss/2/feed"
+  },
+  "mingpao":  {
+    "link": "http://mingpao.com",
+    "rss": "https://news.mingpao.com/rss/pns/s00002.xml"
+  }
+
+}
