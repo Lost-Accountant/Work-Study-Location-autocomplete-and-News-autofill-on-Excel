@@ -14,4 +14,9 @@ driver.get(urlpage)
 driver.execute_script(
     "window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
 
-time.sleep(30)
+time.sleep(10)
+
+results = driver.find_element_by_xpath('//[@class="contents__main main"]')
+
+print('Number of results', len(results))
+
