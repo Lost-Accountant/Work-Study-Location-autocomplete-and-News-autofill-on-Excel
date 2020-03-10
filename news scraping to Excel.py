@@ -21,25 +21,38 @@ def extract_headline(each_article):
     return headline[0]
 
 
-def extract_author(each_tag):
-    return each_tag[2].get_text()
+def extract_author(each_article):
+    authors = each_article.find_all('div', {'class':"author"})
+    author = [author.get_text() for author in authors]
+    if author == []:
+        return 'NA'
+    else:
+        return author[0]
 
 
 def extract_date(each_tag):
-    return each_tag[4].get_text()
+    if 'words' in each_tag[4].get_text():
+        return each_tag[5].get_text()
+
+    elif 'South' in each_tag[4].get_text():
+        return each_tag[3].get_text()
+
+    elif 'scmp.com' in each_tag[4].get_text():
+        return each_tag[3].get_text()
+
+    else:
+        return each_tag[4].get_text()
 
 
 def extract_id(each_tag):
-    return each_tag[-1].get_text()
+
+    return each_tag[-1].get_text().replace('Document ','')
 
 
-def extract_body(divtag):
-    for tag in divtag:
-        paragraphs = tag.find_all('p')
-
+def extract_body(each_tag):
     paragraph = ''
-    for sentence in paragraphs:
-        paragraph = paragraph + sentence.get_text() + ' '
+    for sentence in each_tag:
+        paragraph = paragraph + sentence.get_text() + "\n"
 
     return paragraph
 
@@ -63,9 +76,45 @@ def auto_fill():
     for col_num in range(len(col_names)):
         ws.cell(row=1, column=col_num + 1).value = col_names[col_num]
 
+    # create articles
+    articles = get_articles(load_html())
 
+    # set starting point
+    n_row = 2
 
-    wb.save('C:\\Users\\gxsgt\\Desktop\\Violent Land\\Hong Kong Protest\\balance.xlsx')
+    # iterate through all articles
+    for each_article in articles:
+
+        # key in headline
+        ws['B' + str(n_row)] = extract_headline(each_article)
+
+        # key in author
+        ws['C' + str(n_row)] = extract_author(each_article)
+
+        # extract divtag for the rest
+        divtag = get_divtag(each_article)
+
+        # extract null_tag
+        for tag in divtag:
+            each_null_tag = tag.find_all('p')
+        # key in main body
+        ws['E' + str(n_row)] =  extract_body(each_null_tag)
+
+        # key in ID
+        ws['A' + str(n_row)] = extract_id(each_null_tag)
+
+        # split divtag to each tag with no signature for the rest
+        for tag in divtag:
+            # not sure why loop needed here but it doesn't work if without
+            each_null_tag = tag.find_all('div')
+
+        # key in date
+        ws['D' + str(n_row)] = extract_date(each_null_tag)
+
+        # increment
+        n_row += 1
+
+    wb.save('C:\\Users\\gxsgt\\Desktop\\Violent Land\\Hong Kong Protest\\SCMP.xlsx')
     return
 
 
