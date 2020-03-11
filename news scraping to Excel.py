@@ -66,6 +66,15 @@ def get_articles(soup):
     articles = soup.find_all('div', id =lambda x: x and x.startswith('article'))
     return articles
 
+def filter(each_tag):
+    filter_list = ['economy','lif','my take','spo','biz','opinion']
+    interested = True
+    for topic in filter_list:
+        for tag in each_tag:
+            if topic in tag.get_text().lower():
+                interested = False
+
+    return interested
 
 def auto_fill():
     wb = Workbook()
@@ -85,43 +94,44 @@ def auto_fill():
     # iterate through all articles
     for each_article in articles:
 
-        # key in headline
-        ws['B' + str(n_row)] = extract_headline(each_article)
-
-        # key in author
-        ws['C' + str(n_row)] = extract_author(each_article)
-
         # extract divtag for the rest
         divtag = get_divtag(each_article)
 
         # extract null_tag
         for tag in divtag:
-            each_null_tag = tag.find_all('p')
-        # key in main body
-        ws['E' + str(n_row)] =  extract_body(each_null_tag)
-
-        # key in ID
-        ws['A' + str(n_row)] = extract_id(each_null_tag)
-
-        # split divtag to each tag with no signature for the rest
-        for tag in divtag:
             # not sure why loop needed here but it doesn't work if without
-            each_null_tag = tag.find_all('div')
+            each_p_tag = tag.find_all('p')
+            # split divtag to each tag with no signature for the rest
+            each_div_tag = tag.find_all('div')
 
-        # key in date
-        ws['D' + str(n_row)] = extract_date(each_null_tag)
+            interested = filter(each_div_tag)
 
-        # increment
-        n_row += 1
+        # data entry only if interested topics
+        if interested:
+            # key in headline
+            ws['B' + str(n_row)] = extract_headline(each_article)
+
+            # key in author
+            ws['C' + str(n_row)] = extract_author(each_article)
+
+            # key in main body
+            ws['E' + str(n_row)] =  extract_body(each_p_tag)
+
+            # key in ID
+            ws['A' + str(n_row)] = extract_id(each_p_tag)
+
+            # key in date
+            ws['D' + str(n_row)] = extract_date(each_div_tag)
+
+            # increment
+            n_row += 1
 
     wb.save('C:\\Users\\gxsgt\\Desktop\\Violent Land\\Hong Kong Protest\\SCMP.xlsx')
     return
 
 
 if __name__ == "__main__":
-
-    #load_html()
-    #main_article = load_html().find_all('div', id =lambda x: x and x.startswith('article'))
-    #print(main_article[0])
-    #print(len(main_article))
     auto_fill()
+
+
+# TO DO: ability to write on existing excel file
