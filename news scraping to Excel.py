@@ -2,8 +2,7 @@ from bs4 import BeautifulSoup
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 
-def load_html():
-    file_name = input('what is the html name')
+def load_html(file_name):
     html = r"C:\Users\gxsgt\Desktop\Violent Land\Hong Kong Protest\{}.html".format(file_name)
 
 #html = r"C:\Users\gxsgt\Desktop\Violent Land\Hong Kong Protest\Factiva.html"
@@ -85,8 +84,9 @@ def auto_fill():
     for col_num in range(len(col_names)):
         ws.cell(row=1, column=col_num + 1).value = col_names[col_num]
 
+    file_name = input('what is the html name')
     # create articles
-    articles = get_articles(load_html())
+    articles = get_articles(load_html(file_name))
 
     # set starting point
     n_row = 2
@@ -126,7 +126,7 @@ def auto_fill():
             # increment
             n_row += 1
 
-    wb.save('C:\\Users\\gxsgt\\Desktop\\Violent Land\\Hong Kong Protest\\SCMP.xlsx')
+    wb.save('C:\\Users\\gxsgt\\Desktop\\Violent Land\\Hong Kong Protest\\{}.xlsx'.format(file_name))
     return
 
 
